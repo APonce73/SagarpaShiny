@@ -19,7 +19,7 @@ shinyUI(navbarPage(
                 
                  selectInput(inputId = "Cultivo",
                              label = h6("Cultivo:"), choices = levels(MxMunicipios1$Cultivo),
-                             selected = "Acelga"),
+                             selected = "Agave"),
                  
                  #selectInput(inputId = "Variable1",
                   #           label = h6("Variable:"), choices = names(MxMunicipios1)[15:18],
@@ -75,9 +75,9 @@ shinyUI(navbarPage(
                  
                  
                  
-                 , width = 2),  
+                 , width = 0),  
                fluidRow(column(8,
-                               plotOutput("Rarefraction", width = "1000", height = "600"))
+                               plotOutput("Rarefraction", width = "1300", height = "1000"))
                )
                
                

@@ -71,7 +71,7 @@ RarefraccionCC <- function(Tabla,factor){
   raremax <- min(rowSums(Tabla1))
   col1 <- seq(1:nrow(Tabla1)) #Para poner color a las lineas
   lty1 <- c("solid","dashed","longdash","dotdash")
-  rarecurve(Tabla1, sample = raremax, col = "black", lty = lty1, cex = 0.6)
+  rarecurve(Tabla1, sample = raremax, col = "black", lty = lty1, cex = 1.2)
   #Para calcular el numero de especies de acuerdo a rarefraccion
   UUU <- rarefy(Tabla1, raremax)
   print(UUU)

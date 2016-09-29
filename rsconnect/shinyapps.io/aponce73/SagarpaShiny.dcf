@@ -2,8 +2,8 @@ name: SagarpaShiny
 account: aponce73
 server: shinyapps.io
 appId: 128557
-bundleId: 572182
+bundleId: 572215
 url: https://aponce73.shinyapps.io/SagarpaShiny/
-when: 1475166808.32754
+when: 1475169422.60149
 asMultiple: FALSE
 asStatic: FALSE
