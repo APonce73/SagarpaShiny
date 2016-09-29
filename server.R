@@ -1,49 +1,68 @@
 library(shiny)
 
-shinyServer(input, output, session) {
+shinyServer(function(input, output) {
   
-  # Reactive expression for the data subsetted to what the user selected
-  filteredData <- reactive({
-    states@data <- merge(states@data, subset(hom, year == input$range[1]))
-    states
-    #hom[hom$year == input$range[1] ,]
+  points1 <- reactive({
+  
+    if (input$Cultivo != "All") {
+      Tabla1 <- MxMunicipios1[MxMunicipios1$Cultivo %in% input$Cultivo,]
+    }else {Tabla1 <- MxMunicipios1
+    }
+    #value <- Tabla1[,Tabla1$Variables %in% input$Variables]
+    #Tabla1 <- data.frame(Tabla1, value)
+    
   })
+    
   
-  # This reactive expression represents the palette function,
-  # which changes as the user makes selections in UI.
-  colorpal <- reactive({
-    colorNumeric("Reds", hom$rate)
-  })
-  
-  output$map <- renderLeaflet({
-    # Use leaflet() here, and only include aspects of the map that
-    # won't need to change dynamically (at least, not unless the
-    # entire map is being torn down and recreated).
-    states@data <- merge(states@data, subset(hom, year == 2015))
-    pal <- colorpal()
-    leaflet(states) %>% addTiles() %>%
-      setView(-102, 23.8, 5) %>% 
-      addLegend(position = "bottomright",
-                pal = pal, values = ~hom$rate,
-                title = "homicide<br>rate")
-  })
-  
-  # Incremental changes to the map (in this case, replacing the
-  # circles when a new color is chosen) should be performed in
-  # an observer. Each independent set of things that can change
-  # should be managed in its own observer.
-  observe({
-    pal <- colorpal()
-    head(states@data)
-    leafletProxy("map", data = filteredData()) %>%
-      clearShapes() %>%
-      addPolygons(stroke = TRUE, weight = 1, color = "#000000",
-                  fillOpacity = 0.8, smoothFactor = 0.5,
-                  fillColor = ~pal(rate), 
-                  popup = ~sprintf("State: %s<br/>Rate: %s",
-                                    stri_trans_totitle(state), 
-                                    round(rate, 1)))
-  })
+  #Para la tabla en csv
+  output$downloadData <- downloadHandler(
+    filename = function(){
+      paste("tabla", '.csv', sep = '')},
+    content = function(file){
+      write.csv(points1(), file)
+    }
+  )
+    
+#  MxMunicipios2 <- HHH %>%
+#    filter(Cultivo == "Higo")
+#  
+#  mxmunicipio_choropleth(MxMunicipios2, 
+#                         num_colors = 1,
+#                         title = "Superficie cosechada")
   
   
-}
+  #For do a zoom
+  #head(MxMunicipios)
+  #mxmunicipio_choropleth(MxMunicipios2, num_colors = 1,
+  #                       zoom = subset(MxMunicipios2, state_name %in% c("Morelos","Hidalgo","Ciudad de México"))$region,
+  #                       title = "Valor de Beta, ?rea sembrada con ma?z in South East of M?xico") 
+  
+  
+  output$mymap <- renderLeaflet({
+    MxMunicipios2 <- points1()
+    
+    MxMunicipios3 <- merge(TTT, MxMunicipios2[,c(1,14:18)], by = "region", all.x = T)
+    dim(MxMunicipios3)
+    head(MxMunicipios3)
+    #HHH <- brewer.pal(12, "Paired")
+    #HHH <- c("white",brewer.pal(1, "Accent"),brewer.pal(6, "Reds"))
+    HHH <- c("white",brewer.pal(6, "Reds"))
+    MxMunicipios3$value[is.na(MxMunicipios3$value)] <- 0
+    
+    pal <- colorNumeric(HHH, domain = MxMunicipios3$value)
+    
+    #head(MxMunicipios2)
+    
+    mxmunicipio_leaflet(MxMunicipios3,
+                        pal,
+                        ~ pal(value), mapzoom = 6,
+                        ~ sprintf("Cultivo: %s<br/>State: %s<br/>Municipio: %s<br/>Sup Sembrada (ha): %s<br/>Vol. Producción (Ton): %s <br/>Vol. Prod $: %s",
+                                  Cultivo,state_name, municipio_name, round(value,3), VolProd_Ton, VolProd_Pesos)) %>%
+      addLegend(position = "topright", pal = pal, values = MxMunicipios3$value,
+                title = "Superficie<br>Sembrada (ha)") %>%
+      addProviderTiles("CartoDB.Positron") 
+    
+  }
+  )
+  
+})
