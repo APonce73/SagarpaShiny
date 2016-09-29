@@ -65,4 +65,36 @@ shinyServer(function(input, output) {
   }
   )
   
+  ####################################
+  # Ventana de Diversidad
+  Narbat1 <- reactive({
+    
+    TableL4 <- MxMunicipios5
+    
+  })
+  # 
+  
+  
+  output$Rarefraction <- renderPlot({
+    TableL5 <- Narbat1()
+    #TableL5 <- aggregate(Narbat2[,-1],list(Narbat2[,1]), FUN = sum, na.rm = T)
+    
+    
+    LL35 <- RarefraccionCC(TableL5[,-c(1)], TableL5[,1])
+    return(LL35)
+  })
+  
+  
+  output$Renyi1 <- renderPlotly({
+    TableL5 <- Narbat1()
+    #TableL5 <- aggregate(Narbat2[,-1],list(Narbat2[,1]), FUN = sum, na.rm = T)
+    
+    
+    LL35 <- RenyiCC(TableL5[,-c(1)], TableL5[,1])
+    #return(LL35)
+    gg <- ggplotly(LL35)
+    gg
+  })
+  
+  
 })
